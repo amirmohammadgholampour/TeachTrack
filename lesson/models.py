@@ -14,5 +14,9 @@ class Lesson(models.Model):
         related_name="teacher_lesson" 
     )
 
+    created_at = models.DateTimeField(
+        auto_now_add=True 
+    )
+
     def __str__(self):
         return f"{self.name}({self.teachers})"
