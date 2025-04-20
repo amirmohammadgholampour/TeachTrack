@@ -6,8 +6,7 @@ class ClassRoomAdmin(admin.ModelAdmin):
     list_display = [
         'name',
         'base',
-        'field',
-        'students'
+        'field'
     ]
     search_fields = ['name']
     ordering = ['base', 'field']
