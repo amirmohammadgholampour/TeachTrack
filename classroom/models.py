@@ -21,7 +21,8 @@ class ClassRoom(models.Model):
     students = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="classroom",
-        limit_choices_to={"user_type": "student"}
+        limit_choices_to={"user_type": "student"},
+        verbose_name="Student Users"
     )
 
     teachers = models.ManyToManyField(
@@ -37,6 +38,6 @@ class ClassRoom(models.Model):
     updated_at = models.DateTimeField(
         auto_now_add=True 
     )
-    
+
     def __str__(self):
         return f'{self.name}(base: {self.base})(field: {self.field.name})'
