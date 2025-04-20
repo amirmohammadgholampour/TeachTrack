@@ -28,7 +28,8 @@ class ClassRoom(models.Model):
     teachers = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="teaching_classroom",
-        limit_choices_to={"user_type": "teacher"}
+        limit_choices_to={"user_type": "teacher"},
+        verbose_name="Teacher Users"
     )
 
     created_at = models.DateTimeField(
