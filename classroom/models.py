@@ -30,5 +30,13 @@ class ClassRoom(models.Model):
         limit_choices_to={"user_type": "teacher"}
     )
 
+    created_at = models.DateTimeField(
+        auto_now_add=True 
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now_add=True 
+    )
+    
     def __str__(self):
         return f'{self.name}(base: {self.base})(field: {self.field.name})'
