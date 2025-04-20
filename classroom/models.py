@@ -18,10 +18,9 @@ class ClassRoom(models.Model):
         verbose_name="Field"
     )
 
-    students = models.ForeignKey(
+    students = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name="classroom",
-        on_delete=models.CASCADE,
         limit_choices_to={"user_type": "student"}
     )
 
@@ -32,4 +31,4 @@ class ClassRoom(models.Model):
     )
 
     def __str__(self):
-        return f'{self.name}(base: {self.base})(field: {self.field__name})'
+        return f'{self.name}(base: {self.base})(field: {self.field.name})'
