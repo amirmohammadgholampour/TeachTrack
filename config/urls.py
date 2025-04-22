@@ -47,4 +47,5 @@ urlpatterns = [
 
     path('', include('user.urls')),
     path('', include('classroom.urls')),
+    path('', include('field.urls')),
 ]
