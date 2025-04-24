@@ -21,7 +21,19 @@ class ReportCard(models.Model):
         related_name='report_cards'
     )
 
-    disciplinary_status = models.CharField(max_length=255)
+    DISCPLINARY_STATUS_CHOICES= [
+        ("very_good", "Very good"),
+        ("good", "Good"),
+        ("normal", "Normal"),
+        ("bad", "Bad"),
+        ("very_bad", "Very bad")
+    ]
+    disciplinary_status = models.CharField(
+        max_length=255,
+        choices=DISCPLINARY_STATUS_CHOICES,
+        verbose_name="Discplinary status"
+    )
+    
     grade = models.DecimalField(max_digits=5, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
