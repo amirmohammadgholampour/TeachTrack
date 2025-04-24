@@ -6,6 +6,7 @@ from score.models import Score
 class ReportCard(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        limit_choices_to={"user_type":"student"},
         on_delete=models.CASCADE,
         related_name='report_cards'
     )
@@ -33,7 +34,7 @@ class ReportCard(models.Model):
         choices=DISCPLINARY_STATUS_CHOICES,
         verbose_name="Discplinary status"
     )
-    
+
     grade = models.DecimalField(max_digits=5, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
