@@ -22,7 +22,7 @@ def admin_required(view_func):
     @wraps(view_func)
     def _wraps_view(request, *args, **kwargs):
         user = request.user 
-        if (not user.is_authenticated) or (user.user_type != "admin"):
+        if (not user.is_staff) or (user.user_type != "admin"):
             return Response(
                 {"detail":"You are not allowed to perform this action"},
                 status=status.HTTP_403_FORBIDDEN
