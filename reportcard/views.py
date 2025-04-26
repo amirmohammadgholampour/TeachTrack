@@ -18,7 +18,7 @@ from drf_yasg import openapi
             description="Enter classroom of student"
         ),
         openapi.Parameter(
-            "discplinary_status",
+            "disciplinary_status",
             openapi.IN_QUERY,
             type=openapi.TYPE_STRING,
             description="Enter a discplinary status of student(very good, good, normal, bad, very bad)"
@@ -35,10 +35,10 @@ def reportcardGetView(request, *args, **kwargs):
         queryset = ReportCard.objects.all()
     
     filters = {
-        "class-room": request.query_params.get("class_room"),
-        "disciplinary-status": request.query_params.get("discplinary_status")
+        "class_room_id": request.query_params.get("class_room"),
+        "disciplinary_status__icontains": request.query_params.get("disciplinary_status")
     }
-    filters = {k:v for k,v in filters.items() if v}
+    filters = {k: v for k, v in filters.items() if v} 
     queryset = queryset.filter(**filters)
 
     paginated = PageNumberPagination()
