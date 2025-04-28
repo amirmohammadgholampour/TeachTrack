@@ -1,26 +1,15 @@
 from score.models import Score
 from reportcard.models import ReportCard 
 from reportcard.serializers import ReportCardSerializer
+from reportcard.serializers import ReportCardSerializer
 from common.is_authenticated import authenticated_required
 from common.is_admin import admin_required
 from rest_framework.decorators import api_view 
-from rest_framework.response import Response 
+from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
-def calculate_average(user):
-    scores = Score.objects.filter(students=user)
-    total_score = sum(score.score_value for score in scores)
-    lesson_count = scores.values("lesson").distinct().count()
-
-    if lesson_count == 0:
-        return 0
-
-    average = total_score / lesson_count
-    return round(average, 2)
-
 
 @swagger_auto_schema(
     method="get",
@@ -76,10 +65,27 @@ def reportcardGetView(request, *args, **kwargs):
 @admin_required
 def reportcardPostView(request):
     user = request.user 
-    average = calculate_average(user)
+
+    user_id = request.data.get("user")
+    score_ids = request.data.get("scores")
+
+    if not user_id or not score_ids:
+        return Response(
+            {"detail": "User ID and Scores are required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    students_ids = Score.objects.filter(id__in=score_ids).values_list("students", flat=True).distinct()
+
+    if students_ids.count() != 1 or students_ids.first() != user_id:
+        return Response(
+            {"detail": "Mismatch between selected scores and user."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     serializer = ReportCardSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(grade=average)
+        serializer.save()
         return Response(
             {"detail":"Report Card created successfully!", "data":serializer.data},
             status=status.HTTP_201_CREATED
