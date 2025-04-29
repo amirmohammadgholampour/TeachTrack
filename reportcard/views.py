@@ -64,8 +64,6 @@ def reportcardGetView(request, *args, **kwargs):
 @authenticated_required
 @admin_required
 def reportcardPostView(request):
-    user = request.user 
-
     user_id = request.data.get("user")
     score_ids = request.data.get("scores")
 
@@ -89,6 +87,53 @@ def reportcardPostView(request):
         return Response(
             {"detail":"Report Card created successfully!", "data":serializer.data},
             status=status.HTTP_201_CREATED
+        )
+    else:
+        return Response(
+            {"detail":"Invalid data", "errors":serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+@swagger_auto_schema(
+    method="put",
+    request_body=ReportCardSerializer
+)
+@api_view(["PUT"])
+@authenticated_required
+@admin_required
+def reportcardPutView(request, *args, **kwargs):
+    user_id = request.data.get("user")
+    score_ids = request.data.get("scores")
+
+    if not user_id or not score_ids:
+        return Response(
+            {"detail": "User ID and Scores are required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    students_ids = Score.objects.filter(id__in=score_ids).values_list("students", flat=True).distinct()
+
+    if students_ids.count() != 1 or students_ids.first() != user_id:
+        return Response(
+            {"detail": "Mismatch between selected scores and user."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    reportcard_id = kwargs.get("reportcard_id")
+    try:
+        reportcard = ReportCard.objects.get(id=reportcard_id)
+    except ReportCard.DoesNotExist:
+        return Response(
+            {"detail":"ReportCard not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    serializer = ReportCardSerializer(reportcard, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {"detail":"ReportCard updated successfully!", "data":serializer.data},
+            status=status.HTTP_200_OK
         )
     else:
         return Response(
