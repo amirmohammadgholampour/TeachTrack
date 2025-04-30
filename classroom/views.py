@@ -173,7 +173,6 @@ def classroomPutView(request, *args, **kwargs):
 @swagger_auto_schema(
     method="delete",
     operation_summary="Delete a classroom",
-    request_body=ClassRoomSerializer,
     responses={
         204: "Deleted successfully!",
         403: "Forbidden",
