@@ -71,6 +71,8 @@ AUTH_USER_MODEL = 'user.User'
 ADMIN_PASSWORD = "admin1234"
 TEACHER_PASSWORD = "teacher1234"
 
+APPEND_SLASH = False
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
