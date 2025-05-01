@@ -50,4 +50,5 @@ urlpatterns = [
     path('', include('field.urls')),
     path('', include('score.urls')),
     path('', include('reportcard.urls')),
+    path('', include('event.urls')),
 ]
