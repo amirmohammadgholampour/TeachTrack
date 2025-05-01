@@ -11,7 +11,9 @@ class Event(models.Model):
     )
 
     image = models.ImageField(
-        upload_to="event_images/"
+        upload_to="event_images/",
+        null=True,
+        blank=True
     )
 
     date = models.DateField()
