@@ -8,5 +8,7 @@ class EventSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "image",
+            "date",
+            "time",
             "created_at"
         ]
