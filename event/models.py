@@ -14,6 +14,9 @@ class Event(models.Model):
         upload_to="event_images/"
     )
 
+    date = models.DateField()
+    time = models.TimeField()
+    
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created at"
