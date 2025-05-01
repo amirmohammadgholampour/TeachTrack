@@ -18,3 +18,6 @@ class Event(models.Model):
         auto_now_add=True,
         verbose_name="Created at"
     )
+
+    def __str__(self):
+        return self.name
