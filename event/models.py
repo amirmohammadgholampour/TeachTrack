@@ -15,7 +15,7 @@ class Event(models.Model):
         upload_to="event_images/",
         null=True,
         blank=True
-    )
+    )   
 
     date = models.DateField()
     time = models.TimeField()
