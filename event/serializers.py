@@ -10,5 +10,7 @@ class EventSerializer(serializers.ModelSerializer):
             "image",
             "date",
             "time",
+            "status",
+            "capacity"
             "created_at"
         ]
