@@ -60,6 +60,6 @@ class Registration(models.Model):
         Event,
         on_delete=models.CASCADE 
     )
-    register_at = models.DateTimeField(
+    register_at = models.DateField(
         auto_now_add=True
     )
