@@ -30,7 +30,17 @@ class Event(models.Model):
         choices=STATUS_CHOICES,
         verbose_name="Status of Event"
     )
-    
+
+    CAPACITY_CHOICES = [
+        ("completed", "Completed"),
+        ("empty", "Empty")
+    ]
+    capacity = models.CharField(
+        max_length=255,
+        choices=CAPACITY_CHOICES,
+        verbose_name="Capacity of event"
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created at"
