@@ -19,6 +19,17 @@ class Event(models.Model):
 
     date = models.DateField()
     time = models.TimeField()
+
+    STATUS_CHOICES = [
+        ("held", "Held"),
+        ("not_held", "Not Held"),
+        ("in_progress", "In Progress")
+    ]
+    status = models.CharField(
+        max_length=255,
+        choices=STATUS_CHOICES,
+        verbose_name="Status of Event"
+    )
     
     created_at = models.DateTimeField(
         auto_now_add=True,
