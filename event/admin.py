@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.contrib import messages
-from event.models import Event
+from event.models import Event, Registration
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -14,3 +13,17 @@ class EventAdmin(admin.ModelAdmin):
     ordering = ['name']
     list_per_page = 10
     list_filter = ['created_at']
+
+@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    list_display = [
+        "user__username",
+        "event__name",
+        "register_at"
+    ]
+    search_fields = [
+        "user__username",
+        "event__name"
+    ]
+    ordering = ["user__username"]
+    list_per_page = 10 
