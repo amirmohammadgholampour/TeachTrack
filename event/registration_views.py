@@ -12,6 +12,31 @@ from django.db.models import Q
 from datetime import date
 
 
+@swagger_auto_schema(
+    method="get",
+    manual_parameters=[
+        openapi.Parameter(
+            "event",
+            openapi.IN_QUERY,
+            type=openapi.TYPE_INTEGER
+        ),
+        openapi.Parameter(
+            "user",
+            openapi.IN_QUERY,
+            type=openapi.TYPE_INTEGER
+        ),
+        openapi.Parameter(
+            "status",
+            openapi.IN_QUERY,
+            type=openapi.TYPE_STRING
+        ),
+        openapi.Parameter(
+            "search",
+            openapi.IN_QUERY,
+            type=openapi.TYPE_STRING
+        )
+    ]
+)
 @api_view(["GET"])
 @authenticated_required
 def registerGetView(request, *args, **kwargs):
