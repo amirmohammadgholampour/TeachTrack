@@ -3,6 +3,7 @@ from event.serializers import RegistrationSerializer
 from rest_framework.decorators import api_view
 from common.is_authenticated import authenticated_required
 from common.is_admin import admin_required
+from event.registration_permissions import validations_registeration
 from rest_framework.response import Response 
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
@@ -90,29 +91,10 @@ def registerGetView(request, *args, **kwargs):
 )
 @api_view(["POST"])
 @authenticated_required
+@validations_registeration
 @admin_required
 def registerPostView(request, *args, **kwargs):
-    event_capacity = request.data.get("event__capacity")
-    if event_capacity == "completed":
-        return Response(
-            {"detail":"Compacity for this event is full"},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    event_status = request.data.get("event__status")
-    if event_status in ["held", "in_progress"]:
-        return Response(
-            {"detail":"This event is not open for registrations"},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    req_user=request.user
-    if Registration.objects.filter(user=req_user).count() >= 3:
-        return Response(
-            {"detail":"You are not allowed to registration"},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
+    req_user = request.user 
     serializer = RegistrationSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(user=req_user)
@@ -132,28 +114,10 @@ def registerPostView(request, *args, **kwargs):
 )
 @api_view(["PUT"])
 @authenticated_required
+@validations_registeration
 @admin_required
 def registerPutView(request, *args, **kwargs):
-    event_capacity = request.data.get("event__capacity")
-    if event_capacity == "completed":
-        return Response(
-            {"detail":"Compacity for this event is full"},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    event_status = request.data.get("event__status")
-    if event_status in ["held", "in_progress"]:
-        return Response(
-            {"detail":"This event is not open for registrations"},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    req_user=request.user
-    if Registration.objects.filter(user=req_user).count() >= 3:
-        return Response(
-            {"detail":"You are not allowed to registration"},
-            status=status.HTTP_403_FORBIDDEN
-        )
+    req_user = request.user
 
     register_id = kwargs.get("registration_id")
     try:
@@ -166,7 +130,7 @@ def registerPutView(request, *args, **kwargs):
     
     serializer = RegistrationSerializer(registration, data=request.data, partial=True)
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(user=req_user)
         return Response(
             {"detail":"Registration updated successfully!", "data":serializer.data},
             status=status.HTTP_200_OK
@@ -181,14 +145,7 @@ def registerPutView(request, *args, **kwargs):
 @authenticated_required
 @admin_required
 def registerDeleteView(request, *args, **kwargs):
-    register_id = kwargs.get("registration_id")
-    try:
-        registration = Registration.objects.get(id=register_id)
-    except Registration.DoesNotExist:
-        return Response(
-            {"detail":"Registration not found"},
-            status=status.HTTP_404_NOT_FOUND
-        )
+
     
     registration.delete()
     return Response(
