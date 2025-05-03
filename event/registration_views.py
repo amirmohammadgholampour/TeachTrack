@@ -176,3 +176,22 @@ def registerPutView(request, *args, **kwargs):
             {"detail":"Invalid data", "errors":serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+@api_view(["DELETE"])
+@authenticated_required
+@admin_required
+def registerDeleteView(request, *args, **kwargs):
+    register_id = kwargs.get("registration_id")
+    try:
+        registration = Registration.objects.get(id=register_id)
+    except Registration.DoesNotExist:
+        return Response(
+            {"detail":"Registration not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    registration.delete()
+    return Response(
+        {"detail":"Registration deleted successfully!"},
+        status=status.HTTP_204_NO_CONTENT
+    )
