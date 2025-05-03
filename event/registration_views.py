@@ -3,7 +3,7 @@ from event.serializers import RegistrationSerializer
 from rest_framework.decorators import api_view
 from common.is_authenticated import authenticated_required
 from common.is_admin import admin_required
-from event.registration_permissions import validations_registeration
+from event.registration_permissions import validations_registeration, check_registration_exist
 from rest_framework.response import Response 
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
@@ -143,10 +143,11 @@ def registerPutView(request, *args, **kwargs):
     
 @api_view(["DELETE"])
 @authenticated_required
+@check_registration_exist
 @admin_required
 def registerDeleteView(request, *args, **kwargs):
+    registration = kwargs.get("registration")
 
-    
     registration.delete()
     return Response(
         {"detail":"Registration deleted successfully!"},
