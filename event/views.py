@@ -27,7 +27,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from datetime import date
-from event.permissions import validate_event, check_event_is_exist
+from event.event_permissions import validate_event, check_event_is_exist
 
 # API endpoint to retrieve a list of events
 @swagger_auto_schema(
