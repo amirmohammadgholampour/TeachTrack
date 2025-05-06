@@ -25,6 +25,7 @@ class PresentAbsent(models.Model):
         choices=STATUS_CHOICES,
         verbose_name="Status"
     )
+    date = models.DateField()
 
     def __str__(self):
         return f"student: {self.user.username}({self.status})"
