@@ -6,13 +6,15 @@ class PresentAbsentAdmin(admin.ModelAdmin):
     list_display = [
         "user__username", 
         "classroom",
-        "status"
+        "status",
+        "date"
     ]
     list_editable = ["status"]
     list_filter = [
         "status",
         "classroom__field__name",
         "classroom__base",
+        "date"
     ]
     list_per_page = 10
     ordering = ["status"]
