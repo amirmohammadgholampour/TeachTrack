@@ -7,5 +7,6 @@ class PresentAbsentSerializer(serializers.ModelSerializer):
         fields = [
             "user",
             "classroom",
-            "status"
+            "status",
+            "date"
         ]
