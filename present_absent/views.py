@@ -64,3 +64,41 @@ def getAttendingView(request, *args, **kwargs):
     paginated_queryset = paginated.paginate_queryset(queryset, request)
     serializer = PresentAbsentSerializer(paginated_queryset, many=True)
     return paginated.get_paginated_response(serializer.data)
+
+@swagger_auto_schema(
+    method="post",
+    request_body=PresentAbsentSerializer
+)
+@api_view(["POST"])
+@authenticated_required
+@admin_required
+def postAttendingView(request):
+    classroom_id = request.data.get("classroom")
+    user_id = request.data.get("user")
+    
+    if not ClassRoom.objects.filter(id=classroom_id, students__id=user_id).exists():
+        return Response(
+            {"detail": "Mismatch between selected classroom and user."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    req_date = datetime.strptime(request.data.get("date"), "%Y-%m-%d")
+    main_date = PresentAbsent.objects.filter(user = user_id, date=req_date)
+    if main_date.exists():
+        return Response(
+            {"detail":"This user with this date is already exist."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    serializer = PresentAbsentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {"detail":"Attending created succussfully!", "data":serializer.data},
+            status=status.HTTP_201_CREATED
+        )
+    else:
+        return Response(
+            {"detail":"Invalid data", "errors":serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
