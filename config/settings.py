@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'score',
     'reportcard',
     'event',
-    'present_absent'
+    'present_absent',
 
     'rest_framework',
     'rest_framework_simplejwt',
