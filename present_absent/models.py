@@ -18,7 +18,8 @@ class PresentAbsent(models.Model):
 
     STATUS_CHOICES = [
         ("absent", "Absent"),
-        ("present", "Present")
+        ("present", "Present"),
+        ("excused", "Excused")
     ]
     status = models.CharField(
         max_length=255,
