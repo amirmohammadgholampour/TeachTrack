@@ -131,8 +131,9 @@ def postAttendingView(request):
         )
     
 @api_view(["PUT"])
+@authenticated_required
 def putAttendingView(request, *args, **kwargs):
-    
+
     classroom_id = request.data.get("classroom")
     user_id = request.data.get("user")
     user = request.user
@@ -198,3 +199,8 @@ def putAttendingView(request, *args, **kwargs):
             {"detail":"Invalid data", "errors":serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+@api_view(["DELETE"])
+@authenticated_required
+def deleteAttendingView(request, *args, **kwargs):
+    pass 
