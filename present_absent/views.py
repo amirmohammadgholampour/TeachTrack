@@ -1,5 +1,6 @@
 from present_absent.models import PresentAbsent 
 from classroom.models import ClassRoom
+from user.models import User
 from present_absent.serializers import PresentAbsentSerializer
 from common.is_authenticated import authenticated_required
 from common.is_admin import admin_required
@@ -75,6 +76,13 @@ def getAttendingView(request, *args, **kwargs):
 def postAttendingView(request):
     classroom_id = request.data.get("classroom")
     user_id = request.data.get("user")
+
+    user = User.objects.filter(id=user_id).first()
+    if not user or user.user_type != "student":
+        return Response(
+            {"detail": "Only students can take attendance."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
     if not ClassRoom.objects.filter(id=classroom_id, students__id=user_id).exists():
         return Response(
@@ -83,7 +91,7 @@ def postAttendingView(request):
         )
 
     req_date = datetime.strptime(request.data.get("date"), "%Y-%m-%d")
-    main_date = PresentAbsent.objects.filter(user = user_id, date=req_date)
+    main_date = PresentAbsent.objects.filter(user=user_id, date=req_date)
     if main_date.exists():
         return Response(
             {"detail":"This user with this date is already exist."},
