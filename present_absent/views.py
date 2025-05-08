@@ -83,10 +83,17 @@ def postAttendingView(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
+    
     user = User.objects.filter(id=user_id).first()
     if not user or user.user_type != "student":
         return Response(
             {"detail": "Only students can take attendance."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if user.is_active == False:
+        return Response(
+            {"detail":"This student is inactive."},
             status=status.HTTP_400_BAD_REQUEST
         )
     
