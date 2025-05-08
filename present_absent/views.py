@@ -82,7 +82,6 @@ def postAttendingView(request):
             {"detail":"Only teachers and administrators have the right to register student attendance."},
             status=status.HTTP_403_FORBIDDEN
         )
-
     
     user = User.objects.filter(id=user_id).first()
     if not user or user.user_type != "student":
@@ -129,4 +128,15 @@ def postAttendingView(request):
         return Response(
             {"detail":"Invalid data", "errors":serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
+        )
+    
+@api_view(["PUT"])
+def putAttendingView(request, *args, **kwargs):
+    attending_id = kwargs.get("attending_id")
+    try:
+        PresentAbsent.objects.get(id=attending_id)
+    except PresentAbsent.DoesNotExist:
+        return Response(
+            {"detail":"Attending not found."},
+            status=status.HTTP_404_NOT_FOUND
         )
