@@ -130,6 +130,10 @@ def postAttendingView(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+@swagger_auto_schema(
+    method="put",
+    request_body=PresentAbsentSerializer
+)
 @api_view(["PUT"])
 @authenticated_required
 def putAttendingView(request, *args, **kwargs):
