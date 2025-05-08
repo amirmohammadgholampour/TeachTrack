@@ -77,7 +77,7 @@ def postAttendingView(request):
     user_id = request.data.get("user")
     user = request.user
     
-    if (not user.user_type in ["admin", "teacher"]) or (user.is_staff != True):
+    if (not user.user_type in ["admin", "teacher"]) and (user.is_staff != True):
         return Response(
             {"detail":"Only teachers and administrators have the right to register student attendance."},
             status=status.HTTP_403_FORBIDDEN
