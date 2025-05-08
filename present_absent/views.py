@@ -72,7 +72,6 @@ def getAttendingView(request, *args, **kwargs):
 )
 @api_view(["POST"])
 @authenticated_required
-@admin_required
 def postAttendingView(request):
     classroom_id = request.data.get("classroom")
     user_id = request.data.get("user")
@@ -95,6 +94,13 @@ def postAttendingView(request):
     if main_date.exists():
         return Response(
             {"detail":"This user with this date is already exist."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    present_date = datetime.today()
+    if req_date > present_date:
+        return Response(
+            {"detail":"You cannot record attendance for a future date."},
             status=status.HTTP_400_BAD_REQUEST
         )
     
