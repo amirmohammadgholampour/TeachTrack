@@ -40,3 +40,23 @@ class EventType(models.Model):
 
     def __str__(self):
         return f'{self.name} (+{self.point}) (code: {self.code})'
+    
+
+class StudentEvent(models.Model):
+    student_profile = models.ForeignKey(
+        StudentProfile,
+        on_delete=models.CASCADE,
+        related_name="StudentEvent",
+    )
+
+    event_type = models.ForeignKey(
+        EventType,
+        on_delete=models.CASCADE,
+        verbose_name="Event Type"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    note = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.student_profile.students.username}({self.event_type.name}) at {self.created_at}'
