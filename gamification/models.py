@@ -37,3 +37,6 @@ class EventType(models.Model):
 
     description = models.TextField(verbose_name="Description")
     point = models.IntegerField(verbose_name="Point")
+
+    def __str__(self):
+        return f'{self.name} (+{self.point}) (code: {self.code})'
