@@ -21,3 +21,19 @@ class StudentProfile(models.Model):
 
     def __str__(self):
         return f'{self.students.username}(total points: {self.total_point}) (Level: {self.level})'
+    
+
+class EventType(models.Model):
+    code = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="Code of work"
+    )
+    
+    name = models.CharField(
+        max_length=255,
+        verbose_name="Name"
+    )
+
+    description = models.TextField(verbose_name="Description")
+    point = models.IntegerField(verbose_name="Point")
