@@ -72,3 +72,15 @@ class StudentProfileView(APIView):
         paginated_queryset = paginator.paginate_queryset(queryset, request)
         serializer = StudentProfileSerializer(paginated_queryset, many=True)
         return paginator.get_paginated_response(serializer.data)
+    
+    @swagger_auto_schema(
+        request_body=StudentProfileSerializer,
+        responses={
+            201: "created",
+            400: "bad request",
+            401: "Authenticated required",
+            403: "Forbidden",
+        }
+    )
+    def post(self, request):
+        pass 
