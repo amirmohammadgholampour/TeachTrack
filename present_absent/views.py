@@ -1,16 +1,14 @@
 from present_absent.models import PresentAbsent 
-from classroom.models import ClassRoom
-from user.models import User
 from present_absent.serializers import PresentAbsentSerializer
 from common.is_authenticated import authenticated_required
 from common.is_admin import admin_required
 from rest_framework.decorators import api_view
+from present_absent.permissions import attending_validations, check_attending_exist
 from rest_framework.response import Response 
 from rest_framework.pagination import PageNumberPagination
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework import status 
-from datetime import datetime 
 
 @swagger_auto_schema(
     method="get",
@@ -72,51 +70,8 @@ def getAttendingView(request, *args, **kwargs):
 )
 @api_view(["POST"])
 @authenticated_required
+@attending_validations
 def postAttendingView(request):
-    classroom_id = request.data.get("classroom")
-    user_id = request.data.get("user")
-    user = request.user
-    
-    if (not user.user_type in ["admin", "teacher"]) and (user.is_staff != True):
-        return Response(
-            {"detail":"Only teachers and administrators have the right to register student attendance."},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    user = User.objects.filter(id=user_id).first()
-    if not user or user.user_type != "student":
-        return Response(
-            {"detail": "Only students can take attendance."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    if user.is_active == False:
-        return Response(
-            {"detail":"This student is inactive."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    if not ClassRoom.objects.filter(id=classroom_id, students__id=user_id).exists():
-        return Response(
-            {"detail": "Mismatch between selected classroom and user."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    req_date = datetime.strptime(request.data.get("date"), "%Y-%m-%d")
-    main_date = PresentAbsent.objects.filter(user=user_id, date=req_date)
-    if main_date.exists():
-        return Response(
-            {"detail":"This user with this date is already exist."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    present_date = datetime.today()
-    if req_date > present_date:
-        return Response(
-            {"detail":"You cannot record attendance for a future date."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
     serializer = PresentAbsentSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -136,62 +91,11 @@ def postAttendingView(request):
 )
 @api_view(["PUT"])
 @authenticated_required
+@check_attending_exist
+@attending_validations
 def putAttendingView(request, *args, **kwargs):
-
-    classroom_id = request.data.get("classroom")
-    user_id = request.data.get("user")
-    user = request.user
-    
-    if (not user.user_type in ["admin", "teacher"]) and (user.is_staff != True):
-        return Response(
-            {"detail":"Only teachers and administrators have the right to register student attendance."},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    user = User.objects.filter(id=user_id).first()
-    if not user or user.user_type != "student":
-        return Response(
-            {"detail": "Only students can take attendance."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    if user.is_active == False:
-        return Response(
-            {"detail":"This student is inactive."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    if not ClassRoom.objects.filter(id=classroom_id, students__id=user_id).exists():
-        return Response(
-            {"detail": "Mismatch between selected classroom and user."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    req_date = datetime.strptime(request.data.get("date"), "%Y-%m-%d")
-    main_date = PresentAbsent.objects.filter(user=user_id, date=req_date)
-    if main_date.exists():
-        return Response(
-            {"detail":"This user with this date is already exist."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    present_date = datetime.today()
-    if req_date > present_date:
-        return Response(
-            {"detail":"You cannot record attendance for a future date."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    attending_id = kwargs.get("attending_id")
-    try:
-        PresentAbsent.objects.get(id=attending_id)
-    except PresentAbsent.DoesNotExist:
-        return Response(
-            {"detail":"Attending not found."},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    serializer = PresentAbsentSerializer(data=request.data, partial=True)
+    attending = kwargs.get("attending")
+    serializer = PresentAbsentSerializer(attending, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(
@@ -203,8 +107,18 @@ def putAttendingView(request, *args, **kwargs):
             {"detail":"Invalid data", "errors":serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+
+@swagger_auto_schema(
+    method="delete"
+)
 @api_view(["DELETE"])
 @authenticated_required
+@check_attending_exist
+@admin_required
 def deleteAttendingView(request, *args, **kwargs):
-    pass 
+    attending = kwargs.get("attending")
+    attending.delete()
+    return Response(
+        {"detail":"Attending deleted successfully!"},
+        status=status.HTTP_204_NO_CONTENT
+    )
