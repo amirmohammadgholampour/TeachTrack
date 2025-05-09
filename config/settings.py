@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'reportcard',
     'event',
     'present_absent',
+    'gamification',
 
     'rest_framework',
     'rest_framework_simplejwt',
