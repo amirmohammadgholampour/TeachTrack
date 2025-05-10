@@ -83,4 +83,15 @@ class StudentProfileView(APIView):
         }
     )
     def post(self, request):
-        pass 
+        serializer = StudentProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"detail":"StudentProfile created successfully!", "data":serializer.data},
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                {"detail":"Invalid data", "errors":serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
