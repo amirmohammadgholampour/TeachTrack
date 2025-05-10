@@ -106,3 +106,6 @@ class StudentProfileView(APIView):
                 {"detail":"Invalid data", "errors":serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+class EventType(APIView):
+    pass 
