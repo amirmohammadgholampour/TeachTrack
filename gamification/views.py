@@ -44,7 +44,16 @@ class StudentProfileView(APIView):
     )
     def get(self, request, *args, **kwargs):
         user = request.user
-        queryset = StudentProfile.objects.all() if user.user_type == "admin" else StudentProfile.objects.filter(students=user.id)
+        if not user.user_type in ["admin", "student"]:
+            return Response(
+                {"detail":"Only students can view their profile."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        if (user.user_type != "admin") and (user.is_staff != True):
+            queryset = StudentProfile.objects.filter(students=user)
+        else:
+            queryset = StudentProfile.objects.all()
 
         filters = {
             "total_point": request.query_params.get("total_point"),
