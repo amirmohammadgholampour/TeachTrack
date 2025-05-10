@@ -11,6 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.permissions import IsAuthenticated
+from common.is_admin import admin_required
 
 class StudentProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -91,6 +92,7 @@ class StudentProfileView(APIView):
             403: "Forbidden",
         }
     )
+    @admin_required
     def post(self, request):
         serializer = StudentProfileSerializer(data=request.data)
         if serializer.is_valid():
