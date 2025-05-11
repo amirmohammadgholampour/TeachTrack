@@ -1,5 +1,5 @@
 from django.contrib import admin 
-from gamification.models import EventType, StudentEvent, StudentProfile
+from gamification.models import EventType, StudentEvent, StudentProfile, LevelThreshold
 
 @admin.register(EventType)
 class EventTypeAdmin(admin.ModelAdmin):
@@ -67,3 +67,12 @@ class StudentProfileAdmin(admin.ModelAdmin):
     ordering = [
         "students",
     ]
+
+@admin.register(LevelThreshold)
+class LevelThresholdAdmin(admin.ModelAdmin):
+    list_display = [
+        "level",
+        "min_points"
+    ]
+    list_filter = "level",
+    list_per_page = 10 
