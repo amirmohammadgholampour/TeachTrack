@@ -2,6 +2,17 @@ from django.db import models
 from user.models import User
 from django.db.models import Sum
 
+class LevelThreshold(models.Model):
+    level = models.IntegerField(unique=True)
+    min_points = models.IntegerField()
+
+    class Meta:
+        ordering = ['min_points'] 
+
+    def __str__(self):
+        return f"Level {self.level}: from {self.min_points} points"
+
+
 class StudentProfile(models.Model):
     students = models.OneToOneField(
         User,
