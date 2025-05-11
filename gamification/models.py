@@ -12,7 +12,6 @@ class LevelThreshold(models.Model):
     def __str__(self):
         return f"Level {self.level}: from {self.min_points} points"
 
-
 class StudentProfile(models.Model):
     students = models.OneToOneField(
         User,
@@ -32,6 +31,21 @@ class StudentProfile(models.Model):
     def recalculate_total_points(self):
         total = self.student_event.aggregate(total=Sum('event_type__point'))['total'] or 0
         self.total_point = total
+        self.save()
+        
+    def calculate_level(self):
+        from gamification.models import LevelThreshold
+
+        thresholds = LevelThreshold.objects.order_by('min_points')
+        new_level = 1
+
+        for threshold in thresholds:
+            if self.total_point >= threshold.min_points:
+                new_level = threshold.level
+            else:
+                break
+
+        self.level = new_level
         self.save()
 
     def __str__(self):
