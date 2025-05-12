@@ -107,5 +107,3 @@ class StudentProfileView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-class EventType(APIView):
-    pass 
