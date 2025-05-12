@@ -1,4 +1,6 @@
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
+from common.is_authenticated import authenticated_required
 from rest_framework.response import Response
 from rest_framework import status
 from gamification.models import StudentProfile, EventType, StudentEvent
@@ -107,3 +109,9 @@ class StudentProfileView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+@api_view(["GET"])
+@authenticated_required
+def getBestStudentInSchool(request, *args, **kwargs):
+    queryset = StudentProfile.objects.order_by("-level", "-total_point")[:5]
+    serializer = StudentProfileSerializer(queryset, many=True) 
+    return Response(serializer.data)
