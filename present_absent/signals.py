@@ -29,6 +29,7 @@ def handle_attending_event(instance, created, **kwargs):
             )
 
             profile.recalculate_total_points()
+            profile.calculate_level()
 
         except StudentProfile.DoesNotExist:
             raise ValueError("Student Profile not found.")
