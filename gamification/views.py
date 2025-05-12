@@ -112,6 +112,6 @@ class StudentProfileView(APIView):
 @api_view(["GET"])
 @authenticated_required
 def getBestStudentInSchool(request, *args, **kwargs):
-    queryset = StudentProfile.objects.order_by("-level", "-total_point")[:5]
+    queryset = StudentProfile.objects.order_by("-level", "-total_point")[:3]
     serializer = StudentProfileSerializer(queryset, many=True) 
     return Response(serializer.data)
