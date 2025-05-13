@@ -3,6 +3,23 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from user.models import User 
 
+class TestGetUserView:
+    def test_if_user_unauthenticated_return_401(self):
+        # Arrange
+        client = APIClient()
+
+        # Act
+        response = client.get(
+            "/users/",
+            {
+                "username":"test_student1"
+            },
+            format='json'
+        )
+
+        # Assert 
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        
 @pytest.mark.django_db
 class TestCreateUserView:
     def test_if_valid_data_and_permission_return_201(self):
