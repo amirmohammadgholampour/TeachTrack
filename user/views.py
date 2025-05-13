@@ -175,7 +175,7 @@ def userUpdateView(request, *args, **kwargs):
     if not user.is_authenticated:
         return Response(
             {"detail": "Please sign-in."},
-            status=status.HTTP_403_FORBIDDEN
+            status=status.HTTP_401_UNAUTHORIZED
         )
 
     # Retrieve user_id from URL parameters
