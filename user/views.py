@@ -113,7 +113,7 @@ def userCreateView(request, *args, **kwargs):
     if user.is_authenticated:
         return Response(
             {"detail":"You already have an account."},
-            status=status.HTTP_403_FORBIDDEN 
+            status=status.HTTP_400_BAD_REQUEST
         )
     
     data = request.data.copy()
