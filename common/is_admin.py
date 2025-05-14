@@ -20,12 +20,12 @@ from rest_framework import status
 
 def admin_required(view_func):
     @wraps(view_func)
-    def _wraps_view(request, *args, **kwargs):
+    def _wraps_view(self, request, *args, **kwargs):
         user = request.user 
         if (not user.is_staff) or (user.user_type != "admin"):
             return Response(
                 {"detail":"You are not allowed to perform this action"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        return view_func(request, *args, **kwargs)
+        return view_func(self, request, *args, **kwargs)
     return _wraps_view
