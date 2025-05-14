@@ -75,6 +75,8 @@ TEACHER_PASSWORD = "teacher1234"
 
 APPEND_SLASH = False
 
+SWAGGER_USE_COMPAT_RENDERERS = False
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
