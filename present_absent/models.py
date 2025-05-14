@@ -71,3 +71,37 @@ class AttendanceApproval(models.Model):
 
     def __str__(self):
         return f"Request by {self.teacher.username} → {self.student.username} ({self.status_requested})"
+    
+class AttendanceReview(models.Model):
+    attending_approval = models.OneToOneField(
+        AttendanceApproval,
+        on_delete=models.CASCADE,
+        related_name="review",
+        verbose_name="Attending Request"
+    )
+
+    REVIEW_CHOICES = [
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+        ("pending", "Pending")
+    ]
+    review_status = models.CharField(
+        max_length=20,
+        choices=REVIEW_CHOICES,
+        default="pending",
+        verbose_name="Review Status"
+    )
+
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={"user_type": "admin"},
+        verbose_name="Reviewed by (Admin)"
+    )
+
+    reviewed_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.attending_request} → {self.review_status}"
