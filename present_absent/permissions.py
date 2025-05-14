@@ -48,7 +48,7 @@ def attending_validations(view_func):
         # Check if the user is authorized to register attendance
         if (not user.user_type in ["admin"]) and (user.is_staff != True):
             return Response(
-                {"detail":"Only teachers and administrators have the right to register student attendance."},
+                {"detail":"Only administrators have the right to register student attendance."},
                 status=status.HTTP_403_FORBIDDEN
             )
         
