@@ -6,7 +6,8 @@ from present_absent.views import (
     deleteAttendingView
 )
 from present_absent.attendance_approvald_views import (
-    getAttendanceApprovalView
+    getAttendanceApprovalView,
+    postAttendanceApprovalView
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("attending/<int:attending_id>/delete/", deleteAttendingView),
 
     path("attending/approval/", getAttendanceApprovalView),
+    path("attending/approval/create/", postAttendanceApprovalView),
 ]
