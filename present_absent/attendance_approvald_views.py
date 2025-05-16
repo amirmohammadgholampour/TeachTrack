@@ -10,11 +10,12 @@ from common.is_authenticated import authenticated_required
 from drf_yasg.utils import swagger_auto_schema 
 from drf_yasg import openapi 
 from datetime import datetime
+from django.db.models import Q 
 
 @swagger_auto_schema(
     method="get",
     manual_parameters=[
-        openapi.Parameter("status_requested", openapi.IN_QUERY, type=openapi.TYPE_STRING),
+        openapi.Parameter("status", openapi.IN_QUERY, type=openapi.TYPE_STRING),
         openapi.Parameter("date", openapi.IN_QUERY, type=openapi.TYPE_STRING),
         openapi.Parameter("order_by", openapi.IN_QUERY, type=openapi.TYPE_STRING),
         openapi.Parameter("search", openapi.IN_QUERY, type=openapi.TYPE_STRING),
@@ -42,11 +43,11 @@ def getAttendanceApprovalView(request, *args, **kwargs):
     search_query = request.query_params.get("search")
     if search_query:
         queryset = queryset.filter(
-            teacher__username=search_query,
-            student__username=search_query,
-            classroom__name=search_query
+            Q(teacher__username=search_query) |
+            Q(student__username=search_query) |
+            Q(classroom__name=search_query)
         )
-    
+
     order_by = request.query_params.get("order_by")
     if order_by:
         queryset = queryset.order_by(order_by)
