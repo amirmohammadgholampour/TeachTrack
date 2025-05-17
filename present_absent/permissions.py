@@ -27,7 +27,7 @@ from rest_framework import status
 from user.models import User
 from classroom.models import ClassRoom
 from datetime import datetime
-from present_absent.models import PresentAbsent 
+from present_absent.models import PresentAbsent, AttendanceApproval
 
 # Decorator to validate attendance data
 def attending_validations(view_func):
@@ -41,49 +41,35 @@ def attending_validations(view_func):
     """
     @wraps(view_func)
     def _wrap_view(request, *args, **kwargs):
-        classroom_id = request.data.get("classroom")
-        user_id = request.data.get("user")
-        user = request.user
-        
-        # Check if the user is authorized to register attendance
-        if (not user.user_type in ["admin"]) and (user.is_staff != True):
+        req_user = request.user 
+        if (not req_user.user_type in ["admin", "teacher"]) and (req_user.is_staff != True):
             return Response(
-                {"detail":"Only administrators have the right to register student attendance."},
+                {"detail":"Only teachers and administrators have the right to register student attendance."},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Check if the user being marked is a student
-        user = User.objects.filter(id=user_id).first()
+        student_id = request.data.get("student")
+        user = User.objects.filter(id=student_id).first()
         if not user or user.user_type != "student":
             return Response(
                 {"detail": "Only students can take attendance."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check if the student is active
         if user.is_active == False:
             return Response(
                 {"detail":"This student is inactive."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check for mismatches between the classroom and the user
-        if not ClassRoom.objects.filter(id=classroom_id, students__id=user_id).exists():
+        classroom_id = request.data.get("classroom")
+        if not ClassRoom.objects.filter(id=classroom_id, students__id=student_id).exists():
             return Response(
                 {"detail": "Mismatch between selected classroom and user."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Check for duplicate attendance records for the same user and date
-        req_date = datetime.strptime(request.data.get("date"), "%Y-%m-%d")
-        main_date = PresentAbsent.objects.filter(user=user_id, date=req_date)
-        if main_date.exists():
-            return Response(
-                {"detail":"This user with this date is already exist."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
-        # Disallow attendance for future dates
+        req_date = datetime.strptime(request.data.get("date"), "%Y-%m-%d")
         present_date = datetime.today()
         if req_date > present_date:
             return Response(
@@ -102,17 +88,17 @@ def check_attending_exist(view_func):
     """
     @wraps(view_func)
     def _wrap_view(request, *args, **kwargs):
-        attending_id = kwargs.get("attending_id")
+        attendance_id = kwargs.get("attendance_id")
         try:
             # Retrieve the attendance record
-            attending = PresentAbsent.objects.get(id=attending_id)
-        except PresentAbsent.DoesNotExist:
+            attendance = AttendanceApproval.objects.get(id=attendance_id)
+        except AttendanceApproval.DoesNotExist:
             return Response(
                 {"detail":"Attending not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
         
         # Pass the attendance record to the view function
-        kwargs["attending"] = attending
+        kwargs["attendance"] = attendance
         return view_func(request, *args, **kwargs)
     return _wrap_view
