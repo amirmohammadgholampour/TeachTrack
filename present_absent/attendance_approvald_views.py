@@ -107,6 +107,7 @@ def putAttendanceApprovaldView(request, *args, **kwargs):
 )
 @api_view(["DELETE"])
 @check_attending_exist
+@authenticated_required
 def deleteAttendanceApprovalView(request, *args, **kwargs):
     attendance = kwargs.get("attendance")
     attendance.delete()
