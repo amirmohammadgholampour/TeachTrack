@@ -104,4 +104,4 @@ class AttendanceReview(models.Model):
     reviewed_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.attending_request} → {self.review_status}"
+        return f"{self.attending_approval} → {self.review_status}"

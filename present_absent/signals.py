@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save 
 from django.dispatch import receiver 
-from present_absent.models import PresentAbsent, AttendanceReview
+from present_absent.models import PresentAbsent, AttendanceReview, AttendanceApproval
 from gamification.models import (
     EventType,
     StudentEvent,
@@ -41,7 +41,7 @@ def handle_review_decision(sender, instance, created, **kwargs):
     if instance.review_status == "pending":
         return 
 
-    request = instance.attending_request
+    request = instance.attending_approval
     student = request.student
     classroom = request.classroom
     status = request.status_requested
@@ -66,3 +66,8 @@ def handle_review_decision(sender, instance, created, **kwargs):
         status=final_status,
         date=attendance_date
     )
+
+@receiver(post_save, sender=AttendanceApproval)
+def create_attendance_review(sender, instance, created, **kwargs):
+    if created:
+        AttendanceReview.objects.create(attending_approval=instance)
