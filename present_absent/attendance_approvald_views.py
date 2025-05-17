@@ -1,7 +1,5 @@
-from present_absent.models import AttendanceApproval, PresentAbsent 
+from present_absent.models import AttendanceApproval
 from present_absent.serializers import AttendanceApprovalSerializer
-from user.models import User 
-from classroom.models import ClassRoom
 from rest_framework.decorators import api_view 
 from rest_framework import status 
 from rest_framework.response import Response 
@@ -103,3 +101,16 @@ def putAttendanceApprovaldView(request, *args, **kwargs):
             {"detail":"Invalid data.", "errors":serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+@swagger_auto_schema(
+    method="delete"
+)
+@api_view(["DELETE"])
+@check_attending_exist
+def deleteAttendanceApprovalView(request, *args, **kwargs):
+    attendance = kwargs.get("attendance")
+    attendance.delete()
+    return Response(
+        {"detail":"Attendance deleted successfully!"},
+        status=status.HTTP_204_NO_CONTENT
+    )
