@@ -9,8 +9,8 @@ from rest_framework.pagination import PageNumberPagination
 from common.is_authenticated import authenticated_required
 from drf_yasg.utils import swagger_auto_schema 
 from drf_yasg import openapi 
-from datetime import datetime
 from django.db.models import Q 
+from present_absent.permissions import attending_validations, check_attending_exist
 
 @swagger_auto_schema(
     method="get",
@@ -66,50 +66,8 @@ def getAttendanceApprovalView(request, *args, **kwargs):
 )
 @api_view(["POST"])
 @authenticated_required
+@attending_validations
 def postAttendanceApprovalView(request, *args, **kwargs):
-    req_user = request.user 
-    if (not req_user.user_type in ["admin", "teacher"]) and (req_user.is_staff != True):
-        return Response(
-            {"detail":"Only teachers and administrators have the right to register student attendance."},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    student_id = request.data.get("student")
-    user = User.objects.filter(id=student_id).first()
-    if not user or user.user_type != "student":
-        return Response(
-            {"detail": "Only students can take attendance."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    if user.is_active == False:
-        return Response(
-            {"detail":"This student is inactive."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    classroom_id = request.data.get("classroom")
-    if not ClassRoom.objects.filter(id=classroom_id, students__id=student_id).exists():
-        return Response(
-            {"detail": "Mismatch between selected classroom and user."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    req_date = datetime.strptime(request.data.get("date"), "%Y-%m-%d")
-    main_date = AttendanceApproval.objects.filter(student=student_id, date=req_date)
-    if main_date.exists():
-        return Response(
-            {"detail":"This user with this date is already exist."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    present_date = datetime.today()
-    if req_date > present_date:
-        return Response(
-            {"detail":"You cannot record attendance for a future date."},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
     serializer = AttendanceApprovalSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -122,3 +80,26 @@ def postAttendanceApprovalView(request, *args, **kwargs):
             {"detail":"Invalid data.", "errors":serializer.errors},
             status=status.HTTP_400_BAD_REQUEST
         ) 
+    
+@swagger_auto_schema(
+    method="put",
+    request_body=AttendanceApprovalSerializer
+)
+@api_view(["PUT"])
+@authenticated_required 
+@check_attending_exist
+@attending_validations
+def putAttendanceApprovaldView(request, *args, **kwargs):
+    attendance = kwargs.get("attendance")
+    serializer = AttendanceApprovalSerializer(attendance, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {"detail":"AttendanceApproval updated successfully!","data":serializer.data},
+            status=status.HTTP_200_OK
+        )
+    else:
+        return Response(
+            {"detail":"Invalid data.", "errors":serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
