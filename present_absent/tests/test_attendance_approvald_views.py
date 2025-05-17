@@ -162,3 +162,19 @@ class TestPostAttendanceApprovalView:
 
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+class TestDeleteAttendanceApprovalView:
+    def test_if_attendance_does_not_exist_return_404(self):
+        # Arrange 
+        client = APIClient()
+
+        # Act 
+        response = client.delete(
+            "/attending/approval/<int:attendance_id>/delete/",
+            {
+                "attendance_id":10
+            }
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
