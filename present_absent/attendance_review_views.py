@@ -1,4 +1,4 @@
-from present_absent.models import AttendanceReview
+from present_absent.models import AttendanceReview, AttendanceApproval
 from present_absent.serializers import AttendanceReviewSerializer 
 from common.is_authenticated import authenticated_required
 from common.is_admin import admin_required
@@ -73,3 +73,32 @@ def getAttendanceReview(request, *args, **kwargs):
     paginated_queryset = paginated.paginate_queryset(queryset, request) 
     serializer = AttendanceReviewSerializer(paginated_queryset, many=True)
     return paginated.get_paginated_response(serializer.data)
+
+@swagger_auto_schema(
+    method="post",
+    request_body=AttendanceReviewSerializer
+)
+@api_view(["POST"])
+@authenticated_required
+@admin_required 
+def postAttendanceReview(request, *args, **kwargs):
+    attendance_approval_id = request.data.get("attending_approval")
+    attendance_approval = AttendanceApproval.objects.filter(id=attendance_approval_id)
+    if not attendance_approval.exists():
+        return Response(
+            {"detail":"AttendanceApproval not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    serializer = AttendanceReviewSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {"detail":"Attendance Review created successfully!", "data":serializer.data},
+            status=status.HTTP_201_CREATED
+        )
+    else:
+        return Response(
+            {"detail":"Invalid data.", "errors":serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
